@@ -1,4 +1,8 @@
 ## Login in OSC, either by using SSH in your terminal, a command line instanc ein your web browser, or using VSCode from OSC
+```shell
+ssh ruthsarah@pitzer.osc.edu
+Su6Er5Om6Ut4R%
+```
 ## Check where you are and make sure you create your working directory in the right place
 ```shell
 cd /fs/scratch/PAS3260/SarahR/
@@ -22,18 +26,29 @@ ls -lh
     # 1 fastq file, zipped and unzipped
     # 1 bam file and 1 sam file (probably the fastq file aligned to the reference)
     # 1 vcf file (probably variation btw reference seq and the fastq file)
-    # 1 gff3 file (not sure why)
-    # 1 md5 file (not sure why)
+    # 1 gff3 file (annotation file)
+    # 1 md5 file (verify data integrity)
 ## There is a md5 file, what are md5 files for?     
     #The md5 file uses and algorithm to convert a file into a string of 32 characters. If the files become changed or corrupted, this will result in a different string. By computing the string for our current file and comparing it to the md5 file, we can check that they were copied correctly.
 ## Let's work with this file:
 ```shell
 md5sum -c Lab5.md5 > Checking.txt 
+cat Lab5.md5
+cat Checking.txt
 grep "FAIL" Checking.txt
-## Parenthesis on integrity checking
-touch myDNA.fasta
-nano myDNA.fasta
-md5sum myDNA.fasta
+
+## Changing file contents to experiment with md5 files
+cp ref_Run1CB3334.fasta myDNA.fasta
+nano myDNA.fasta #deleted first nucleotide
+md5sum myDNA.fasta >> Lab5.md5 #add md5 sum from myDNA.fasta to the md5 file
+md5sum -c Lab5.md5 > Checking_post.txt #recheck values
+mv Rice2.gff3 Rice.gff3 #changing the file name prevents md5sum from working
+
+#creating an md5 file (write all md5 sums and put it in a new file)
+md5sum ref_Run1CB3334.fasta Rice.gff3 Run1CB3334.bam Run1CB3334.fastq Run1CB3334.fastq.gz Run1CB3334.sam Run1CB3334.vcf > new.md5
+ls #check that file was created
+cat new.md5 #check contents
+
 # Inspect the files
 ```
 ## Now, let's explore the files a little:
@@ -46,6 +61,7 @@ head Run1CB3334.fastq.gz
 head Run1CB3334.bam
 ```
 ### Do you see something weird?
+    #the zip file (.gz) and the .bam file are not human readable
 ## For `Run1CB3334.fastq.gz` try:
 ```shell
 zcat Run1CB3334.fastq.gz | head
@@ -57,30 +73,38 @@ head -100 Run1CB3334.fastq | less
 ```
 
 ### How would you count the number of reads in the fastq file?
+    #count the number of lines as divide by 4
 ```shell
-wc -l Run1CB3334.fastq
+wc -l Run1CB3334.fastq #count the number of lines
 ```
 # Is it? Try:
-zcat Run1CB3334.fastq.gz | echo "$((`wc -l` / 4))"
+zcat Run1CB3334.fastq.gz | echo "$((`wc -l` / 4))" #unzip the file, count the number of lines, divide by four and print that to the screen
 ```
 Why the difference?
 ### Let's download some data from NCBI
 ```
-module load sratoolkit/2.10.7
+module spider sratoolkit
+module spider sratoolkit/3.0.2
+module load sratoolkit/3.0.2
 # What is sratoolkit?
-fastq-dump --gzip --split-files --readids --origfmt ERR3638927
+    #software for downloading and working with sequence data from the NCBI sequence read archive (SRA)
+fastq-dump --gzip --split-files --readids --origfmt ERR3638927  #download zipped fastq file
 ```
 (a faster option is fasterq-dump, how can you look for information about this command?)
+fasterq-dump --help
 ```shell
-zcat ERR3638927.fastq.gz | head
+zcat ERR3638927_1.fastq.gz | head
 ```
 ## Let's download a SAM file
 ```shell
 sam-dump --output-file ERR3638927.sam ERR3638927
+ls
 ```
 To manipulate the SAM file we will need samtools:
 ```shell
-module load samtools/1.10
+module spider samtools
+module spider samtools/1.21
+module load samtools/1.21
 ```
 Then, we can make a sorted BAM file:
 ```shell
