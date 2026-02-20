@@ -1,27 +1,34 @@
 ## Login in OSC, either by using SSH in your terminal, a command line instanc ein your web browser, or using VSCode from OSC
 ## Check where you are and make sure you create your working directory in the right place
 ```shell
-cd /fs/scratch/PAS3260/User/
-mkdir Lab_4
+cd /fs/scratch/PAS3260/SarahR/
+mkdir Lab4
 ```
 
 ## Copy files to your working directory, for example:
 ```shell
-cp /fs/scratch/PAS3260/Jonathan/Lab_4/ ?
+cp /fs/scratch/PAS3260/Jonathan/Lab_4/* Lab4
 ```
 
 ## Go to your working directory and execute:
 ```shell
-cd Lab_4
+cd Lab4
 ls -l
 ls -Llh
 ls -lh
 ```
 ### What do you see?
-## There is a md5 file, what are md5 files for? Explain
+    # A fasta file for the reference sequence
+    # 1 fastq file, zipped and unzipped
+    # 1 bam file and 1 sam file (probably the fastq file aligned to the reference)
+    # 1 vcf file (probably variation btw reference seq and the fastq file)
+    # 1 gff3 file (not sure why)
+    # 1 md5 file (not sure why)
+## There is a md5 file, what are md5 files for?     
+    #The md5 file uses and algorithm to convert a file into a string of 32 characters. If the files become changed or corrupted, this will result in a different string. By computing the string for our current file and comparing it to the md5 file, we can check that they were copied correctly.
 ## Let's work with this file:
 ```shell
-md5sum -c Lab5.md5 > Checking.txt
+md5sum -c Lab5.md5 > Checking.txt 
 grep "FAIL" Checking.txt
 ## Parenthesis on integrity checking
 touch myDNA.fasta
